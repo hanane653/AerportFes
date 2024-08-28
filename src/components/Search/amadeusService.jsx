@@ -10,6 +10,7 @@ const getAccessToken = async () => {
       'https://test.api.amadeus.com/v1/security/oauth2/token',
       null,
       {
+        
         params: {
           grant_type: 'client_credentials',
           client_id: API_KEY,

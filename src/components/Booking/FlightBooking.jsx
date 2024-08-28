@@ -5,14 +5,13 @@ import { RiAccountPinCircleLine } from 'react-icons/ri';
 import { RxCalendar } from 'react-icons/rx';
 import Aos from 'aos';
 import 'aos/dist/aos.css';
-import FlightradarWidget from './FlightradarWidget';
+import FlightradarWidget from '../Search/FlightradarWidget';
 import { useTranslation } from '../../context/TranslationContext';
- // Assurez-vous de mettre à jour le chemin si nécessaire
 
-const API_KEY = 'ZL95SDtlO3jXHUJJ5QXC0cPMaxJ4ge2m';
-const API_SECRET = 'urxSFWvFSRwNpmhi';
+const API_KEY = 'JkSQCFgu5dh4Ol4MpgOIpmRYSv5BPq0M';
+const API_SECRET = '8bw8bdHeNjtIbQMM';
 
-const Search = () => {
+const FlightBooking = () => {
   const { translations } = useTranslation();
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
@@ -21,6 +20,12 @@ const Search = () => {
   const [flights, setFlights] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedFlight, setSelectedFlight] = useState(null);  // NEW: Store selected flight
+  const [passengerInfo, setPassengerInfo] = useState({
+    firstName: '',
+    lastName: '',
+    passportNumber: '',
+  });
 
   useEffect(() => {
     Aos.init({ duration: 2000 });
@@ -147,6 +152,58 @@ const Search = () => {
     setLoading(false);
   };
 
+
+  const handleSelectFlight = (flight) => {
+    setSelectedFlight(flight);
+  };
+
+  const handleBookingSubmission = async () => {
+    const token = await getAccessToken();
+
+    const travelers = [
+      {
+        id: '1',
+        dateOfBirth: '1990-01-01',  // Example birth date
+        name: {
+          firstName: passengerInfo.firstName,
+          lastName: passengerInfo.lastName,
+        },
+        gender: 'MALE',
+        documents: [
+          {
+            documentType: 'PASSPORT',
+            number: passengerInfo.passportNumber,
+            nationality: 'US',  // Example nationality
+            holder: true,
+          },
+        ],
+      },
+    ];
+
+    try {
+      const response = await axios.post(
+        'https://test.api.amadeus.com/v1/booking/flight-orders',
+        {
+          type: 'flight-order',
+          flightOffers: [selectedFlight],
+          travelers: travelers,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      console.log('Booking Successful:', response.data);
+      alert('Flight booked successfully!');
+    } catch (error) {
+      console.error('Booking Error:', error);
+      setError('Failed to book flight');
+    }
+  };
+
   const getAccessToken = async () => {
     try {
       const response = await axios.post(
@@ -171,6 +228,7 @@ const Search = () => {
 
   return (
     <div className="search section container">
+      {/* Existing search UI */}
       <div data-aos="fade-up" data-aos-duration="2500" className="sectionContainer">
         <div className="btns flex">
           <div className="singleBtn">
@@ -295,13 +353,52 @@ const Search = () => {
       <br></br>
       <br></br>
 
-      {/* Widget Flightradar */}
+      {/* Widget Flightradar 
       <h3 className="flights-title">{translations.flightResults || 'Flight Widget'}</h3>
       <FlightradarWidget />
       <br></br>
       <br></br>
+    */}
+      {/* Booking Form */}
+      {selectedFlight && (
+        <div className="booking-form">
+          <h3>{translations.booking || 'Booking Information'}</h3>
+          <div>
+            <label>First Name:</label>
+            <input
+              type="text"
+              value={passengerInfo.firstName}
+              onChange={(e) => setPassengerInfo({ ...passengerInfo, firstName: e.target.value })}
+              required
+            />
+          </div>
+          <div>
+            <label>Last Name:</label>
+            <input
+              type="text"
+              value={passengerInfo.lastName}
+              onChange={(e) => setPassengerInfo({ ...passengerInfo, lastName: e.target.value })}
+              required
+            />
+          </div>
+          <div>
+            <label>Passport Number:</label>
+            <input
+              type="text"
+              value={passengerInfo.passportNumber}
+              onChange={(e) => setPassengerInfo({ ...passengerInfo, passportNumber: e.target.value })}
+              required
+            />
+          </div>
+          <button onClick={handleBookingSubmission}>
+            {translations.bookFlight || 'Book Flight'}
+          </button>
+        </div>
+      )}
+
+      
     </div>
   );
 };
 
-export default Search;
+export default FlightBooking;

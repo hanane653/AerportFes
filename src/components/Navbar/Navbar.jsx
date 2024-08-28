@@ -1,50 +1,46 @@
-import { useState } from 'react'
-import { SiConsul } from 'react-icons/si'
-import { AiOutlineGlobal } from 'react-icons/ai'
-import { BsPhoneVibrate } from 'react-icons/bs'
-import { CgMenuGridO } from 'react-icons/cg'
-import logo from '../../assets/logo.png'
+import React, { useState, useContext, useEffect } from 'react';
+import { SiConsul } from 'react-icons/si';
+import { AiOutlineGlobal } from 'react-icons/ai';
+import { BsPhoneVibrate } from 'react-icons/bs';
+import { CgMenuGridO } from 'react-icons/cg';
+import { AuthContext } from "../../AuthContext";
+import logo from '../../assets/logo.png';
+//import LanguageSelector from '../LanguageSelector/LanguageSelector'; // Assurez-vous que le chemin est correct
 
-const Navbar = () => {
-
-  // remove navBar on small screens
+const Navbar = ({ onAuthClick }) => {
   const [active, setActive] = useState('navBarMenu');
+  const [noBg, addBg] = useState('navBarTwo');
+  const { user, logout } = useContext(AuthContext);
+
   const showNavBar = () => {
     setActive('navBarMenu showNavBar');
-  }
+  };
+
   const removeNavBar = () => {
     setActive('navBarMenu');
-  }
+  };
 
-  // add bgcolor on second nabVar
-  const [noBg, addBg] = useState('navBarTwo');
   const addBgColor = () => {
     if (window.scrollY >= 10) {
       addBg('navBarTwo navbar_With_Bg');
     } else {
-      addBg('navBarTwo')
+      addBg('navBarTwo');
     }
-  }
-  window.addEventListener('scroll', addBgColor)
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', addBgColor);
+    return () => window.removeEventListener('scroll', addBgColor);
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    // Optionnel : redirection vers une autre page ou notification
+  };
 
   return (
     <div className='navBar flex'>
-      <div className="navBarOne flex">
-        <div>
-          <SiConsul className='icon' />
-        </div>
-
-        <div className="none flex">
-          <li className='flex'><BsPhoneVibrate className='icon' />Support</li>
-          <li className='flex'><AiOutlineGlobal className='icon' />Languages</li>
-        </div>
-
-        <div className="atb flex">
-          <span>Sign In</span>
-          <span>Sign Out</span>
-        </div>
-
-      </div>
+      
 
       <div className={noBg}>
         <div className="logoDiv">
@@ -52,15 +48,13 @@ const Navbar = () => {
         </div>
         <div className={active}>
           <ul className="menu flex">
-            <li onClick={removeNavBar} className="listItem">Home</li>
-            <li onClick={removeNavBar} className="listItem">About</li>
-            <li onClick={removeNavBar} className="listItem">Offers</li>
-            <li onClick={removeNavBar} className="listItem">Seats</li>
-            <li onClick={removeNavBar} className="listItem">Destinations</li>
+            <li onClick={removeNavBar} className="listItem" style={{ cursor: 'pointer' }}>Home</li>
+            <li onClick={removeNavBar} className="listItem" style={{ cursor: 'pointer' }}>About</li>
+            <li onClick={removeNavBar} className="listItem" style={{ cursor: 'pointer' }}>Offers</li>
+            <li onClick={removeNavBar} className="listItem" style={{ cursor: 'pointer' }}>Seats</li>
+            <li onClick={removeNavBar} className="listItem" style={{ cursor: 'pointer' }}>Destinations</li>
           </ul>
           <button className='btn flex btnOne'>Contact</button>
-
-
         </div>
         <button className='btn flex btnTwo'>Contact</button>
         <div onClick={showNavBar} className="toggleIcon">
@@ -68,7 +62,7 @@ const Navbar = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

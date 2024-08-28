@@ -43,7 +43,7 @@ const Travelers = () => {
   return (
     <div className="travelers container section">
       <div className="sectionContainer">
-        <h2>Top travelers of this Month!</h2>
+        <h2>Customer Testimonials</h2>
 
         <div className="travelersContainer grid">
 
